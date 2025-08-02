@@ -209,6 +209,10 @@ def expand_program_name(name: str, program_type: str = "lisans") -> list[str]:
         if name_lower in PROGRAM_EXPANSIONS:
             return PROGRAM_EXPANSIONS[name_lower]
 
+        # Simplify program names
+        name_lower = name_lower.replace("mühendislik", "mühendis")
+        name_lower = name_lower.replace("mühendisliği", "mühendis")
+
         # Then try partial matching within lisans programs
         matches = []
         for program in PROGRAMS:
