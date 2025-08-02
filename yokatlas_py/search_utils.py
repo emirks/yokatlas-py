@@ -44,6 +44,9 @@ PROGRAM_EXPANSIONS = {
         "Endüstri Mühendisliği",
         "Endüstri Yönetimi Mühendisliği",
     ],
+    "mühendislik": "mühendis",
+    "mühendisliği": "mühendis",
+    "müh": "mühendis",
     "inşaat": ["İnşaat Mühendisliği", "İnşaat Mühendisliği (M.T.O.K.)"],
     "insaat": ["İnşaat Mühendisliği", "İnşaat Mühendisliği (M.T.O.K.)"],
     "kimya": [
