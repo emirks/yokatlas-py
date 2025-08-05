@@ -10,7 +10,13 @@ def load_column_data() -> dict[str, str]:
     json_path = os.path.join(os.path.dirname(__file__), "columnData.json")
     with open(json_path, "r") as file:
         column_data = json.load(file)
-        if isinstance(column_data, list) and len(column_data) > 0:
+
+        # Handle both old format (list with URL-encoded string) and new format (direct dict)
+        if isinstance(column_data, dict):
+            # New format: direct dictionary
+            return column_data
+        elif isinstance(column_data, list) and len(column_data) > 0:
+            # Old format: list with URL-encoded string
             return dict(parse_qsl(column_data[0]))
     return {}
 
