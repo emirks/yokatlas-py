@@ -465,6 +465,7 @@ class LocalYOKATLASSearcher:
             taban_2024 = program.get("taban", {}).get("2024", "N/A")
             city = program.get("sehir_adi", "N/A")
             uni_type = program.get("universite_turu", "N/A")
+            yop_kodu = program.get("yop_kodu", "N/A")
 
             # Main line
             main_line = f"     {i}. {uni_name} - {program_name}"
@@ -474,11 +475,12 @@ class LocalYOKATLASSearcher:
             # Details line
             details = []
             if tbs_2024 != "N/A":
-                details.append(f"TBS: {tbs_2024}")
+                details.append(f"Taban Sıralama: {tbs_2024}")
             if taban_2024 != "N/A":
-                details.append(f"Taban: {taban_2024}")
-            details.append(f"City: {city}")
-            details.append(f"Type: {uni_type}")
+                details.append(f"Taban Puanı: {taban_2024}")
+            details.append(f"Şehir: {city}")
+            details.append(f"Üniversite Türü: {uni_type}")
+            details.append(f"YOP Kodu: {yop_kodu}")
 
             details_line = f"        {' | '.join(details)}"
 
