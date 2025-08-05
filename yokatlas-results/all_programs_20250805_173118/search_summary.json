@@ -1,0 +1,28 @@
+{
+  "search_timestamp": "20250805_173118",
+  "total_searches": 4,
+  "results_directory": "yokatlas-results\\all_programs_20250805_173118",
+  "puan_turu_results": {
+    "say": {
+      "description": "Sayısal (SAY)",
+      "count": 5653,
+      "filename": "lisans_programs_say.json"
+    },
+    "ea": {
+      "description": "Eşit Ağırlık (EA)",
+      "count": 3987,
+      "filename": "lisans_programs_ea.json"
+    },
+    "söz": {
+      "description": "Sözel (SÖZ)",
+      "count": 1948,
+      "filename": "lisans_programs_söz.json"
+    },
+    "dil": {
+      "description": "Dil (DİL)",
+      "count": 677,
+      "filename": "lisans_programs_dil.json"
+    }
+  },
+  "grand_total_programs": 12265
+}

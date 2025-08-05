@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-08-05T17:36:29.112599",
+  "total_programs": 12265,
+  "embedding_dimension": 384,
+  "model_name": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "puan_turu_counts": {
+    "say": 5653,
+    "ea": 3987,
+    "söz": 1948,
+    "dil": 677
+  }
+}

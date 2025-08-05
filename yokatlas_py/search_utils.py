@@ -248,6 +248,40 @@ def expand_program_name(name: str, program_type: str = "lisans") -> list[str]:
     return [name]
 
 
+def turkish_upper(text: str) -> str:
+    """
+    Convert text to uppercase with proper Turkish character handling.
+
+    Args:
+        text: Text to convert to uppercase
+
+    Returns:
+        Uppercase text with Turkish characters properly converted
+    """
+    if not text:
+        return text
+
+    # Turkish character mapping for uppercase conversion
+    turkish_mapping = {
+        "i": "İ",  # dotted i to capital İ
+        "ı": "I",  # dotless ı to capital I
+        "ğ": "Ğ",
+        "ü": "Ü",
+        "ş": "Ş",
+        "ö": "Ö",
+        "ç": "Ç",
+    }
+
+    result = ""
+    for char in text:
+        if char in turkish_mapping:
+            result += turkish_mapping[char]
+        else:
+            result += char.upper()
+
+    return result
+
+
 def normalize_score_type(score_type: str) -> str:
     """
     Normalize score type to lowercase.
@@ -296,6 +330,8 @@ def normalize_search_params(
         "ucret_durumu": "ucret",
         "education_type": "ogretim_turu",
         "egitim_turu": "ogretim_turu",
+        "siralama_alt_sinir": "ust_bs",
+        "siralama_ust_sinir": "alt_bs",
     }
 
     # Process each parameter
@@ -316,8 +352,8 @@ def normalize_search_params(
         elif normalized_key == "puan_turu":
             normalized[normalized_key] = normalize_score_type(value)
         elif normalized_key == "sehir":
-            # Cities should be uppercase
-            normalized[normalized_key] = value.upper()
+            # Cities should be uppercase with Turkish character handling
+            normalized[normalized_key] = turkish_upper(value)
         else:
             # Keep other parameters as is
             normalized[normalized_key] = value

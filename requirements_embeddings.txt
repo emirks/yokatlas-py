@@ -1,0 +1,11 @@
+# Requirements for YOKATLAS embedding functionality
+# Install with: pip install -r requirements_embeddings.txt
+
+# Core embedding library
+sentence-transformers>=2.0.0
+
+# Vector similarity search (optional but recommended for performance)
+faiss-cpu>=1.7.0
+
+# Core dependencies (usually already installed)
+numpy>=1.20.0 

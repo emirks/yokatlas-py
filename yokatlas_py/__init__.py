@@ -10,17 +10,17 @@ from . import models, config
 from .search_wrappers import (
     search_lisans_programs,
     search_onlisans_programs,
-    search_programs
+    search_programs,
 )
 
 __all__ = [
-    'YOKATLASLisansAtlasi',
-    'YOKATLASLisansTercihSihirbazi',
-    'YOKATLASOnlisansAtlasi',
-    'YOKATLASOnlisansTercihSihirbazi',
-    'models',
-    'config',
-    'search_lisans_programs',
-    'search_onlisans_programs',
-    'search_programs'
+    "YOKATLASLisansAtlasi",
+    "YOKATLASLisansTercihSihirbazi",
+    "YOKATLASOnlisansAtlasi",
+    "YOKATLASOnlisansTercihSihirbazi",
+    "models",
+    "config",
+    "search_lisans_programs",
+    "search_onlisans_programs",
+    "search_programs",
 ]
