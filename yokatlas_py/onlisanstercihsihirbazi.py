@@ -86,6 +86,15 @@ class YOKATLASOnlisansTercihSihirbazi:
             "page": None,  # Will be converted to start
         }
 
+        # Handle siralama parameter for önlisans (note: önlisans programs may not have ranking data)
+        # This is added for consistency but may not be used for önlisans programs
+        if "siralama" in params or "sıralama" in params:
+            siralama = params.get("siralama") or params.get("sıralama")
+            if siralama:
+                # Note: Önlisans programs typically use score-based filtering (ust_puan/alt_puan)
+                # rather than ranking-based filtering. This is included for consistency.
+                pass
+
         # Apply array parameters
         for user_key, api_key in array_params.items():
             if user_key in params and params[user_key]:

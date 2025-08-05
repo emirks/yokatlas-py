@@ -33,7 +33,7 @@ class YOKATLASLisansTercihSihirbazi:
     def _set_defaults(self) -> None:
         """Set default values for search parameters."""
         defaults: dict[str, Union[str, int]] = {
-            "draw": 4,  # Updated from 2 to 4
+            "draw": 19,  # Updated to match actual website request
             "start": 0,
             "length": 50,
             "search[value]": "",
@@ -51,9 +51,9 @@ class YOKATLASLisansTercihSihirbazi:
             "ucret": "[]",
             "ogretim_turu": "[]",
             "doluluk": "[]",
-            # Updated ordering: default sort column changed from 37 to 34
+            # Updated ordering: sort by TBS (column 34) descending - best rankings first
             "order[0][column]": "34",
-            "order[0][dir]": "desc",
+            "order[0][dir]": "desc",  # Descending - best (lowest) rankings appear first
             "order[1][column]": "41",
             "order[1][dir]": "asc",
             "order[2][column]": "42",
@@ -83,7 +83,24 @@ class YOKATLASLisansTercihSihirbazi:
             "length": "length",  # Results per page
             "start": "start",  # Start index for pagination
             "page": None,  # Will be converted to start
+            "ust_bs": "ust_bs",  # Upper ranking limit
+            "alt_bs": "alt_bs",  # Lower ranking limit
         }
+
+        # Handle siralama parameter (convert to ust_bs and alt_bs)
+        if "siralama" in params or "sıralama" in params:
+            siralama = params.get("siralama") or params.get("sıralama")
+            if siralama:
+                siralama_int = int(siralama)
+                # Calculate range based on actual website behavior
+                better_ranking = int(
+                    siralama_int * 0.5
+                )  # En Az Başarı Sırası (better ranking - lower number)
+                worse_ranking = int(
+                    siralama_int * 1.5
+                )  # En Çok Başarı Sırası (worse ranking - higher number)
+                self.columns["ust_bs"] = str(better_ranking)  # ust_bs = En Az = better
+                self.columns["alt_bs"] = str(worse_ranking)  # alt_bs = En Çok = worse
 
         # Apply array parameters
         for user_key, api_key in array_params.items():

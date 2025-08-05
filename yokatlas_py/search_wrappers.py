@@ -26,26 +26,13 @@ def search_lisans_programs(
         >>> search_lisans_programs({"uni": "itü", "bolum": "elektrik", "puan_turu": "SAY"})
         >>> search_lisans_programs({"siralama": 1000})  # Filter by ranking range
     """
-    # Check if sıralama filtering is requested
-    siralama = params.get("siralama") or params.get("sıralama")
-
-    # Prepare search parameters
-    search_params = params.copy()
-
-    # If sıralama is provided, get full results by setting high length
-    if siralama:
-        search_params.pop("length", None)  # Get full results
-        # Remove siralama from search params as it's not a search filter
-        search_params.pop("siralama", None)
-        search_params.pop("sıralama", None)
-
     if not smart_search:
         # Use original search without enhancements
-        search = YOKATLASLisansTercihSihirbazi(search_params)
+        search = YOKATLASLisansTercihSihirbazi(params)
         results = search.search()
     else:
         # Normalize parameters
-        normalized_params = normalize_search_params(search_params, "lisans")
+        normalized_params = normalize_search_params(params, "lisans")
 
         # If program is specified, try expanding it
         if "program" in normalized_params:
@@ -78,35 +65,6 @@ def search_lisans_programs(
             search = YOKATLASLisansTercihSihirbazi(normalized_params)
             results = search.search()
             results = results if isinstance(results, list) else []
-
-    # Apply sıralama filtering if requested
-    if siralama and isinstance(results, list):
-        filtered_results = []
-        lower_bound = int(siralama * 0.5)
-        upper_bound = int(siralama * 1.5)
-
-        for result in results:
-            # Get TBS data for most recent available year
-            tbs_data = result.get("tbs", {})
-            if not tbs_data:
-                continue
-
-            # Try to get the most recent year's TBS (2025, 2024, 2023, 2022)
-            recent_tbs = None
-            for year in ["2025", "2024", "2023", "2022"]:
-                tbs_value = tbs_data.get(year)
-                if tbs_value and tbs_value.strip() and tbs_value != "---":
-                    try:
-                        recent_tbs = int(tbs_value)
-                        break
-                    except (ValueError, TypeError):
-                        continue
-
-            # Filter by TBS range
-            if recent_tbs and lower_bound <= recent_tbs <= upper_bound:
-                filtered_results.append(result)
-
-        return filtered_results
 
     return results if isinstance(results, list) else []
 
