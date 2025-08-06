@@ -50,9 +50,24 @@ class LocalYOKATLASSearcher:
         """
         files = {}
 
-        # Look for the most recent data directory
-        pattern = os.path.join(self.data_directory, "all_programs_*")
+        # Look for the most recent data directory based on program type
+        if program_type == "onlisans":
+            pattern = os.path.join(self.data_directory, "all_onlisans_programs_*")
+        else:
+            pattern = os.path.join(self.data_directory, "all_programs_*")
+
         data_dirs = glob.glob(pattern)
+
+        if not data_dirs:
+            # Fallback: try generic pattern for both types
+            fallback_pattern = os.path.join(self.data_directory, "all_*programs_*")
+            all_dirs = glob.glob(fallback_pattern)
+
+            # Filter directories that contain the right program type files
+            for dir_path in all_dirs:
+                test_pattern = os.path.join(dir_path, f"{program_type}_programs_*.json")
+                if glob.glob(test_pattern):
+                    data_dirs.append(dir_path)
 
         if not data_dirs:
             return files
@@ -335,8 +350,13 @@ class LocalYOKATLASSearcher:
                 except (ValueError, TypeError):
                     pass
 
-        # Determine score type
-        score_type = normalize_score_type(normalized_params.get("puan_turu", "say"))
+        # Determine score type based on program type
+        if program_type == "onlisans":
+            # Onlisans programs only use TYT score type
+            score_type = "tyt"
+        else:
+            # Lisans programs use various score types
+            score_type = normalize_score_type(normalized_params.get("puan_turu", "say"))
 
         # Get data files
         data_files = self._get_data_files(program_type)
@@ -554,21 +574,36 @@ def search_local_onlisans_programs(
     Enhanced local search for onlisans (associate) programs.
 
     Args:
-        params: Search parameters (can use common variations)
+        params: Search parameters (can use common variations including sıralama for bell curve sampling)
         smart_search: Enable smart parameter normalization and program expansion
         data_directory: Path to directory containing JSON data files
-        max_results: Maximum number of results (applies bell curve sampling if exceeded)
+        max_results: Maximum number of results (applies bell curve sampling if exceeded with sıralama)
         return_formatted: If True, returns dict with both results and formatted string
 
     Returns:
         List of programs found, or dict with results and formatted string if return_formatted=True
+
+    Example:
+        >>> # These all work for onlisans:
+        >>> search_local_onlisans_programs({"universite": "ANADOLU", "program": "Bilgisayar"})
+        >>> search_local_onlisans_programs({"sıralama": 5000, "sehir": "istanbul"}, max_results=50, return_formatted=True)
+        >>> search_local_onlisans_programs({"program": "Turizm", "universite_turu": "Devlet"})
     """
     searcher = LocalYOKATLASSearcher(data_directory)
+
+    # Store original siralama for formatting (onlisans DOES use siralama!)
+    original_siralama = params.get("siralama") or params.get("sıralama")
+    if original_siralama:
+        try:
+            original_siralama = int(original_siralama)
+        except (ValueError, TypeError):
+            original_siralama = None
+
     results = searcher.search_programs(params, "onlisans", smart_search, max_results)
 
     if return_formatted:
         formatted_string = searcher.format_search_results(
-            results, params, None, max_results  # onlisans doesn't use siralama
+            results, params, original_siralama, max_results
         )
         return {
             "results": results,
