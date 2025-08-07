@@ -122,7 +122,7 @@ def find_best_university_match(name: str, program_type: str = "lisans") -> str:
     )
 
     # Normalize input
-    name_clean = name.upper().strip()
+    name_clean = turkish_upper(name).strip()
 
     # If it's already in the list exactly, return it
     if name_clean in university_list:
@@ -305,7 +305,7 @@ def normalize_search_params(
     Normalize search parameters for YOKATLAS API.
 
     Args:
-        params: Raw search parameters
+        params: Raw search parameters (supports list inputs for universite, program, sehir)
         program_type: "lisans" or "onlisans" to determine which university list to use
 
     Returns:
@@ -345,15 +345,32 @@ def normalize_search_params(
 
         # Process based on parameter type
         if normalized_key == "universite":
-            normalized[normalized_key] = normalize_university_name(value, program_type)
+            if isinstance(value, list):
+                # Apply normalization to each item in the list
+                normalized[normalized_key] = [
+                    normalize_university_name(item, program_type)
+                    for item in value
+                    if item
+                ]
+            else:
+                normalized[normalized_key] = normalize_university_name(
+                    value, program_type
+                )
         elif normalized_key == "program":
             # Don't expand here, we'll handle it in the search wrapper
+            # Just keep the list as is, or single value as is
             normalized[normalized_key] = value
         elif normalized_key == "puan_turu":
             normalized[normalized_key] = normalize_score_type(value)
         elif normalized_key == "sehir":
-            # Cities should be uppercase with Turkish character handling
-            normalized[normalized_key] = turkish_upper(value)
+            if isinstance(value, list):
+                # Apply Turkish uppercase to each item in the list
+                normalized[normalized_key] = [
+                    turkish_upper(item) for item in value if item
+                ]
+            else:
+                # Cities should be uppercase with Turkish character handling
+                normalized[normalized_key] = turkish_upper(value)
         else:
             # Keep other parameters as is
             normalized[normalized_key] = value
