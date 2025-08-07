@@ -112,6 +112,31 @@ class LocalYOKATLASSearcher:
             print(f"Error loading data from {file_path}: {e}")
             return []
 
+    def _is_valid_tbs(self, tbs_value: Any) -> bool:
+        """
+        Check if a TBS (Taban Başarı Sıralaması) value is valid for ranking purposes.
+
+        Args:
+            tbs_value: TBS value to check
+
+        Returns:
+            True if TBS value is valid (numeric and not indicating "no data")
+        """
+        if not tbs_value or tbs_value is None:
+            return False
+
+        # Check for string indicators of invalid data
+        if isinstance(tbs_value, str):
+            if tbs_value in ["---", "Dolmadı", "Yeni"]:
+                return False
+
+        # Try to convert to integer
+        try:
+            int(tbs_value)
+            return True
+        except (ValueError, TypeError):
+            return False
+
     def _match_text(self, text: str, query: str) -> bool:
         """
         Check if text matches query (case-insensitive, partial match).
@@ -201,8 +226,10 @@ class LocalYOKATLASSearcher:
 
         # Get 2024 TBS (most recent available)
         tbs_2024 = program.get("tbs", {}).get("2024")
-        if not tbs_2024 or tbs_2024 == "---":
-            return True
+
+        # When siralama filtering is active, exclude programs with invalid TBS values
+        if not self._is_valid_tbs(tbs_2024):
+            return False
 
         try:
             tbs_value = int(tbs_2024)
@@ -221,7 +248,8 @@ class LocalYOKATLASSearcher:
 
             return True
         except (ValueError, TypeError):
-            return True
+            # If TBS value can't be converted to int, exclude it when ranking filters are active
+            return False
 
     def _match_program(self, program: Dict[str, Any], filters: Dict[str, Any]) -> bool:
         """
@@ -435,7 +463,7 @@ class LocalYOKATLASSearcher:
         valid_tbs_values = []
         for program in results:
             tbs_2024 = program.get("tbs", {}).get("2024")
-            if tbs_2024 and tbs_2024 != "---":
+            if self._is_valid_tbs(tbs_2024):
                 try:
                     valid_tbs_values.append(int(tbs_2024))
                 except (ValueError, TypeError):
@@ -499,7 +527,7 @@ class LocalYOKATLASSearcher:
         valid_programs = []
         for program in programs:
             tbs_2024 = program.get("tbs", {}).get("2024")
-            if tbs_2024 and tbs_2024 != "---":
+            if self._is_valid_tbs(tbs_2024):
                 try:
                     tbs_value = int(tbs_2024)
                     distance = abs(tbs_value - target_ranking)
@@ -733,12 +761,17 @@ def search_local_lisans_programs(
     Returns:
         List of programs found, or dict with results and formatted string if return_formatted=True
 
+    Note:
+        When using 'siralama' parameter, only programs with valid TBS (Taban Başarı Sıralaması) values
+        are included. Programs with TBS values of None, "---", "Dolmadı", or "Yeni" are excluded
+        from siralama-based searches as they don't have meaningful ranking data.
+
     Example:
         >>> # These all work:
         >>> search_local_lisans_programs({"uni_adi": "Boğaziçi", "program_adi": "Bilgisayar"})
         >>> search_local_lisans_programs({"universite": "ODTÜ", "program": "Yazılım"})
         >>> search_local_lisans_programs({"uni": "itü", "bolum": "elektrik", "puan_turu": "SAY"})
-        >>> search_local_lisans_programs({"siralama": 1000})  # Filter by ranking range
+        >>> search_local_lisans_programs({"siralama": 1000})  # Filter by ranking range (excludes invalid TBS)
         >>> search_local_lisans_programs({"siralama": 1000, "sehir": "istanbul"}, max_results=50, return_formatted=True)  # With formatting
         >>> # List inputs for multiple values:
         >>> search_local_lisans_programs({"universite": ["Boğaziçi", "ODTÜ"], "program": ["bilgisayar", "yazılım"]})
@@ -788,6 +821,11 @@ def search_local_onlisans_programs(
 
     Returns:
         List of programs found, or dict with results and formatted string if return_formatted=True
+
+    Note:
+        When using 'siralama' parameter, only programs with valid TBS (Taban Başarı Sıralaması) values
+        are included. Programs with TBS values of None, "---", "Dolmadı", or "Yeni" are excluded
+        from siralama-based searches as they don't have meaningful ranking data.
 
     Example:
         >>> # These all work for onlisans:
